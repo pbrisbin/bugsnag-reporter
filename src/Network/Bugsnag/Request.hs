@@ -16,6 +16,7 @@ import qualified Data.ByteString.Char8 as C8
 import Data.IP
 import Data.Maybe (fromMaybe)
 import GHC.Generics
+import Network.Bugsnag.BugsnagRequestHeaders
 import Network.HTTP.Types
 import Network.Socket
 import Network.Wai
@@ -23,7 +24,7 @@ import Network.Wai
 -- | The web request being handled when the error was encountered
 data BugsnagRequest = BugsnagRequest
     { brClientIp :: Maybe ByteString
-    , brHeaders :: Maybe RequestHeaders
+    , brHeaders :: Maybe BugsnagRequestHeaders
     , brHttpMethod :: Maybe Method
     , brUrl :: Maybe ByteString
     , brReferer :: Maybe ByteString
@@ -49,7 +50,7 @@ bugsnagRequestFromWaiRequest :: Request -> BugsnagRequest
 bugsnagRequestFromWaiRequest request = bugsnagRequest
     { brClientIp = requestRealIp request
         <|> Just (sockAddrToIp $ remoteHost request)
-    , brHeaders = Just $ requestHeaders request
+    , brHeaders = Just $ bugsnagRequestHeaders $ requestHeaders request
     , brHttpMethod = Just $ requestMethod request
     , brUrl = Just $ requestUrl request
     , brReferer = requestHeaderReferer request
